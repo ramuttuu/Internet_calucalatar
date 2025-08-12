@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>💠 लोन कैलकुलेटर — Nimmalwar Tulsiram (Days Interest)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg1:#f0f7ff; --bg2:#fff7f3;
+    --card:#ffffff; --primary:#0b6cff; --accent:#ff6b3d; --muted:#52606d;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family:'Poppins',sans-serif;
+    background: linear-gradient(135deg,var(--bg1),var(--bg2));
+    color:#0f1724; padding:18px;
+  }
+
+  .wrap{max-width:900px;margin:10px auto}
+  header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
+  header h1{margin:0;font-size:20px}
+  header .by{font-size:13px;color:var(--muted)}
+
+  .grid{display:grid;grid-template-columns:1fr 360px;gap:14px}
+  @media(max-width:920px){.grid{grid-template-columns:1fr}}
+
+  .card{background:var(--card);border-radius:14px;padding:16px;box-shadow:0 10px 30px rgba(8,16,30,0.06)}
+  label{display:block;font-size:13px;color:var(--muted);margin-top:10px}
+  input[type=number], input[type=date], select{width:100%;padding:10px;border-radius:10px;border:1px solid #e6eef8;font-size:15px}
+  .seg{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+  .modeBtn{padding:8px 12px;border-radius:10px;border:1px solid #e6eef8;background:#fff;cursor:pointer;font-weight:600}
+  .modeBtn.active{background:linear-gradient(90deg,var(--primary),#3b8fff);color:#fff;border:0}
+
+  .row{display:flex;gap:8px}
+  .btnPrimary{flex:1;background:linear-gradient(90deg,var(--primary),#3b8ff0);color:#fff;border:0;padding:12px;border-radius:10px;font-weight:700;cursor:pointer}
+  .btnGhost{background:transparent;border:1px solid #e6eef8;padding:10px;border-radius:10px;cursor:pointer;color:var(--muted)}
+  .small{font-size:13px;color:var(--muted)}
+  .result{margin-top:12px;padding:14px;border-radius:12px;background:linear-gradient(90deg,#fff,#fbfeff);border-left:5px solid var(--accent)}
+  table{width:100%;border-collapse:collapse;margin-top:6px}
+  th,td{padding:8px;text-align:left;border-bottom:1px solid #f1f5f9;font-size:14px}
+  .emoji{font-size:18px;margin-right:6px}
+  footer{margin-top:16px;text-align:center;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>💠 आकर्षक लोन कैलकुलेटर</h1>
+        <div class="small">सहज • हिंदी • ₹ प्रति 100 प्रति माह • Days interest included</div>
+      </div>
+      <div class="by">Designed — <strong>Nimmalwar Tulsiram</strong></div>
+    </header>
+
+    <div class="grid">
+      <!-- LEFT -->
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-weight:700">कैलकुलेटर</div>
+          <div class="small">Flat-rate (₹/100/month)</div>
+        </div>
+
+        <label>💰 लोन राशि (₹)</label>
+        <input id="principal" type="number" placeholder="उदा. 100000">
+
+        <label>🔖 ब्याज (₹ प्रति ₹100 प्रति माह)</label>
+        <input id="ratePer100" type="number" step="0.01" placeholder="उदा. 2">
+
+        <label>🛠️ विकल्प चुनें</label>
+        <div class="seg">
+          <button id="btnDate" class="modeBtn active">📅 तारीख़ से</button>
+          <button id="btnManual" class="modeBtn">✍️ Manual Months/Days</button>
+          <button id="btnFillToday" class="modeBtn">📌 Start = आज</button>
+          <button id="btnFillCalcToday" class="modeBtn">📌 Calc = आज</button>
+        </div>
+
+        <!-- Date section -->
+        <div id="dateSection" style="margin-top:12px">
+          <label>🔹 पैसे दिए जाने की तारीख (Start)</label>
+          <input id="startDate" type="date">
+
+          <label>🔹 गणना की तारीख (Calc) — खाली रखें = आज</label>
+          <input id="calcDate" type="date">
+        </div>
+
+        <!-- Manual section -->
+        <div id="manualSection" style="display:none;margin-top:12px">
+          <label>📆 कुल महीने (Months)</label>
+          <input id="manualMonths" type="number" min="0" placeholder="उदा. 7">
+
+          <label>📅 अतिरिक्त दिन (Days)</label>
+          <input id="manualDays" type="number" min="0" placeholder="उदा. 15">
+          <div class="small">यदि आप महीनों/दिनों को सीधे दर्ज करना चाहें</div>
+        </div>
+
+        <label style="margin-top:12px">🧾 Days नियम</label>
+        <div class="small">अब दिन भी ब्याज में शामिल होंगे — <strong>days / 30</strong> करके माह में बदला जाएगा (उदा. 15 दिन = 0.5 माह, 1 दिन ≈ 0.0333 माह)।</div>
+
+        <div class="row" style="margin-top:12px">
+          <button id="calculateBtn" class="btnPrimary">🔢 गणना करें</button>
+          <button id="resetBtn" class="btnGhost">♻️ रीसेट</button>
+        </div>
+
+        <div id="output" class="result" style="display:none"></div>
+      </div>
+
+      <!-- RIGHT -->
+      <div>
+        <div class="card">
+          <div style="font-weight:700">नतीजे (Result)</div>
+          <div class="small" style="margin-top:6px">यहाँ पर आपके calculations emojis के साथ साफ दिखेंगे — समय, effective months, ब्याज और कुल वापसी।</div>
+
+          <div style="margin-top:10px; display:flex; gap:8px;">
+            <button id="saveBtn" class="btnGhost">💾 Save</button>
+            <button id="loadBtn" class="btnGhost">📂 Load</button>
+            <button id="exportBtn" class="btnGhost">🖨️ Print</button>
+          </div>
+        </div>
+
+        <div style="height:12px"></div>
+
+        <div class="card">
+          <div style="font-weight:700">Help</div>
+          <div class="small" style="margin-top:8px">
+            • Start date डालें या Start = आज बटन से भर दें।<br>
+            • Calc date खाली छोड़ेंगे तो आज से कैलकुलेट होगा।<br>
+            • Manual mode में months/days सीधे डाल सकते हैं।<br>
+            • Days का इंटरेस्ट now proportional है (days/30).
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer>© Nimmalwar Tulsiram</footer>
+  </div>
+
+<script>
+  // shortcuts
+  const $ = id => document.getElementById(id);
+  const fmtINR = v => Number(v).toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2});
+
+  // elements
+  const btnDate = $('btnDate'), btnManual = $('btnManual'), btnFillToday = $('btnFillToday'), btnFillCalcToday = $('btnFillCalcToday');
+  const dateSection = $('dateSection'), manualSection = $('manualSection');
+  const calculateBtn = $('calculateBtn'), resetBtn = $('resetBtn');
+  const output = $('output');
+  const saveBtn = $('saveBtn'), loadBtn = $('loadBtn'), exportBtn = $('exportBtn');
+
+  // mode toggles
+  btnDate.addEventListener('click', ()=>{ setMode('date'); });
+  btnManual.addEventListener('click', ()=>{ setMode('manual'); });
+  btnFillToday.addEventListener('click', ()=>{ $('startDate').value = new Date().toISOString().slice(0,10); });
+  btnFillCalcToday.addEventListener('click', ()=>{ $('calcDate').value = new Date().toISOString().slice(0,10); });
+
+  function setMode(mode){
+    if(mode==='date'){
+      btnDate.classList.add('active'); btnManual.classList.remove('active');
+      dateSection.style.display='block'; manualSection.style.display='none';
+    } else {
+      btnManual.classList.add('active'); btnDate.classList.remove('active');
+      manualSection.style.display='block'; dateSection.style.display='none';
+    }
+  }
+
+  resetBtn.addEventListener('click', ()=>{
+    $('principal').value=''; $('ratePer100').value=''; $('startDate').value=''; $('calcDate').value='';
+    $('manualMonths').value=''; $('manualDays').value=''; output.style.display='none';
+  });
+
+  // main calculate
+  calculateBtn.addEventListener('click', ()=>{
+    const principal = parseFloat($('principal').value);
+    const ratePer100 = parseFloat($('ratePer100').value);
+
+    if (isNaN(principal) || principal <= 0) { alert('कृपया लोन राशि सही डालें'); return; }
+    if (isNaN(ratePer100) || ratePer100 < 0) { alert('कृपया ब्याज (₹ प्रति ₹100 प्रति माह) सही डालें'); return; }
+
+    let years=0, months=0, days=0, effectiveMonths=0;
+
+    if (btnDate.classList.contains('active')) {
+      const sVal = $('startDate').value;
+      if (!sVal) { alert('कृपया पैसे देने की तारीख भरें'); return; }
+      const start = new Date(sVal);
+      const eVal = $('calcDate').value;
+      const end = eVal ? new Date(eVal) : new Date();
+
+      if (end < start) { alert('कैलकुलेशन तारीख start तारीख से पहले नहीं हो सकती'); return; }
+
+      // compute Y M D precisely
+      years = end.getFullYear() - start.getFullYear();
+      months = end.getMonth() - start.getMonth();
+      days = end.getDate() - start.getDate();
+
+      if (days < 0) {
+        months--;
+        const prevMonthDays = new Date(end.getFullYear(), end.getMonth(), 0).getDate();
+        days += prevMonthDays;
+      }
+      if (months < 0) {
+        years--;
+        months += 12;
+      }
+
+      // NEW: include days proportionally: days/30
+      effectiveMonths = years*12 + months + (days / 30);
+
+    } else {
+      // manual
+      const m = parseInt($('manualMonths').value) || 0;
+      const d = parseInt($('manualDays').value) || 0;
+      if (m < 0 || d < 0) { alert('महीने/दिन सही डालें'); return; }
+      years = Math.floor(m / 12);
+      months = m % 12;
+      days = d;
+      // NEW: include days proportionally: days/30
+      effectiveMonths = m + (d / 30);
+    }
+
+    // calculations (flat-rate in ₹ per 100 per month)
+    // interest = (principal / 100) * ratePer100 * effectiveMonths
+    const totalInterest = (principal / 100) * ratePer100 * effectiveMonths;
+    const totalPayable = principal + totalInterest;
+    const approxPerMonth = effectiveMonths > 0 ? (totalPayable / effectiveMonths) : 0;
+
+    // show results with emojis
+    output.style.display='block';
+    output.innerHTML = `
+      <div style="font-weight:700;margin-bottom:8px">📊 परिणाम</div>
+      <table>
+        <tr><td>⏳ बीता समय</td><td>${years} साल, ${months} महीने, ${days} दिन</td></tr>
+        <tr><td>🧾 Days दिखा</td><td>${days} दिन</td></tr>
+        <tr><td>🔢 Effective months</td><td>${Number(effectiveMonths.toFixed(4))} माह</td></tr>
+        <tr><td>💸 कुल ब्याज</td><td>₹ ${fmtINR(totalInterest)}</td></tr>
+        <tr><td>💰 कुल देय (Principal + Interest)</td><td>₹ ${fmtINR(totalPayable)}</td></tr>
+        <tr><td>📅 अनुमानित प्रति माह</td><td>${effectiveMonths>0 ? '₹ '+fmtINR(approxPerMonth)+' (approx)' : '—'}</td></tr>
+      </table>
+      <div class="small" style="margin-top:8px">नोट: Days का ब्याज proportional है (days/30)।</div>
+    `;
+
+    // enable save
+    lastResult = {
+      principal, ratePer100, years, months, days, effectiveMonths, totalInterest, totalPayable
+    };
+  });
+
+  // Save / Load using localStorage (simple)
+  let lastResult = null;
+  saveBtn.addEventListener('click', ()=>{
+    try {
+      const state = {
+        principal: $('principal').value, ratePer100: $('ratePer100').value,
+        startDate: $('startDate').value, calcDate: $('calcDate').value,
+        manualMonths: $('manualMonths').value, manualDays: $('manualDays').value
+      };
+      localStorage.setItem('loan_calc_state_v1', JSON.stringify(state));
+      alert('Saved ✅');
+    } catch(e){ alert('Save failed'); }
+  });
+  loadBtn.addEventListener('click', ()=>{
+    try {
+      const s = localStorage.getItem('loan_calc_state_v1');
+      if(!s) return alert('No saved data');
+      const st = JSON.parse(s);
+      $('principal').value = st.principal || '';
+      $('ratePer100').value = st.ratePer100 || '';
+      $('startDate').value = st.startDate || '';
+      $('calcDate').value = st.calcDate || '';
+      $('manualMonths').value = st.manualMonths || '';
+      $('manualDays').value = st.manualDays || '';
+      alert('Loaded ✅');
+    } catch(e){ alert('Load failed'); }
+  });
+
+  // print/export simple
+  exportBtn.addEventListener('click', ()=>{
+    if(output.style.display === 'none') return alert('कृपया पहले गणना करें');
+    const w = window.open('', '_blank');
+    w.document.write('<pre style="font-family:Arial, sans-serif; font-size:14px;">' + output.innerText + '</pre>');
+    w.document.close();
+    w.print();
+  });
+
+</script>
+</body>
+</html>
